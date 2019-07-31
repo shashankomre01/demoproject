@@ -1,0 +1,123 @@
+1. Configure Minikube :-
+
+	(i).  Create namespace name is a nginx
+        (ii). Deploy website as container in nginx namespace [Note:- HTML code directory /home/iface/nginx-testing] 
+
+
+
+
+
+
+
+
+
+
+2. Configure  Docker :- 
+
+	(i).  Run mysql with phpmyadmin in Docker [Note:- mysql data must be persistence]
+	(ii). Run wordpress with mysql in Docker
+    
+   version: '3'
+
+services:
+  # Database
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    networks:
+      - wpsite
+  # phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: password 
+    networks:
+      - wpsite
+  # Wordpress
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - '8000:80'
+    restart: always
+    volumes: ['./:/var/www/html']
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    networks:
+      - wpsite
+networks:
+  wpsite:
+volumes:
+  db_data:
+
+
+3. Create bash script for mysql to migrate user with Grant privileges on that database.
+
+     (i).	[For example :- mysql-server-a have 10 users and 10 databases as like {anand,narendra.....} then migrate mysql user with grant 			privileges in mysql-server-b] 
+     
+    (ii).       Create script for run some mysql query in all only iface_testing_* database.
+
+		[for example :- query =  create table iface-test]  
+#echo "CREATE USER '$USER'@'$HOST' IDENTIFIED BY '$PASS'" | sudo mysql -uroot -predhat  2> /dev/null
+echo "SHOW DATABASES" | sudo mysql -uroot -predhat  2> /dev/null
+echo "enter tha name of database in which you want to create table"
+read DB
+echo "USE $DB" | mysql -uroot -proot  2> /dev/null
+echo "enter table name"
+read table
+echo "CREATE TABLE $DB.$table (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255) )" | sudo mysql -uroot -predhat  2> /dev/null
+#echo "GRANT ALL ON $DB.* TO '$USER'@'$HOST'" | mysql -uroot -proot  2> /dev/null
+
+ 
+
+4 Configure Jenkins CI/CD pipeline.
+
+	(i). create freestyle project pipeline.
+		
+		project pipeline name =  iface-testing
+		github clone  repository url = https://github.com/ak895912/iface-testing.git
+		branch = master
+		build trigger Poll SCM run per minute
+		build docker images for this repository and push on docker hub 
+				docker hub account = anand91073/iface-testing
+		Deploy and expose this image in nginx namespace inside minikube by CD.
+
+
+5. Change docker image tag in iface.yaml file [Note:- use awk and sed command]
+ 
+
+6. Configure multi-user samba server :-
+	
+	(i). create users and directory details below.
+		
+		Directory Name = iface-samba
+		User list      = iface,itsolvs
+		read only      = narendra
+        	write list     = anand
+
+		[Note:- samba users password should be iface@123]
+
+
+7. Create a directory iface and create two users itsolvs1 and itsolvs2 
+	1 itsolvs1 user should have read, write permissions. 
+        2 itsolvs2 user should have only read permission.
+
+
+
+
