@@ -98,7 +98,7 @@ echo "CREATE TABLE $DB.$table (PersonID int, LastName varchar(255), FirstName va
 				docker hub account = anand91073/iface-testing
 		Deploy and expose this image in nginx namespace inside minikube by CD.
 
-
+https://www.techrunnr.com/build-and-push-docker-image-to-docker-hub-using-jenkins/
 5. Change docker image tag in iface.yaml file [Note:- use awk and sed command]
  
 
